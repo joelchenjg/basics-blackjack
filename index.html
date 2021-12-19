@@ -180,7 +180,7 @@
       <button id="deal-button">Deal</button>
       <button id="hit-button">Hit</button>
       <button id="stand-button">Stand</button>
-      <button id="reveal-button">Reveal</button>
+      <button id="restart-button">restart</button>
       <p>Output:</p>
       <div id="output-div"></div>
     </div>
@@ -192,7 +192,7 @@
       var dealbutton = document.querySelector("#deal-button");
       var hitbutton = document.querySelector("#hit-button");
       var standbutton = document.querySelector("#stand-button");
-      var revealbutton = document.querySelector("#reveal-button");
+      var restartbutton = document.querySelector("#restart-button");
       button.addEventListener("click", function () {
         // Set result to input value
         var input = document.querySelector("#input-field");
@@ -224,8 +224,8 @@
         output.innerHTML = result;
       });
 
-      revealbutton.addEventListener("click", function () {
-        var result = main("reveal");
+      restartbutton.addEventListener("click", function () {
+        var result = main("restart");
         var output = document.querySelector("#output-div");
         output.innerHTML = result;
       });

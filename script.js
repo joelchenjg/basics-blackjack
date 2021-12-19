@@ -7,12 +7,16 @@
 document.querySelector("#deal-button").disabled = true;
 document.querySelector("#hit-button").disabled = true;
 document.querySelector("#stand-button").disabled = true;
-document.querySelector("#reveal-button").disabled = true;
+document.querySelector("#restart-button").disabled = true;
 
 // Global variables
 var playerCards = [];
 var computerCards = [];
 var gameMode = "number of players";
+var players = [1, 2, 3, 4, 5, 6];
+var playerScore = [0, 0, 0, 0, 0, 0];
+var computerScore = [0, 0, 0, 0, 0, 0];
+var numberofplayers = 1;
 
 // returns a complete cardDeck; name, suit, rank (1-13)
 var makeDeck = function () {
@@ -105,7 +109,58 @@ var shuffledDeck = shuffleCards(makeDeck());
 // regular deck of card objects
 var cardDeck = makeDeck();
 
-// GAME MODES PRESENT
+// ================ GAME MODES PRESENT ================
+
+// start of game
+function gameDeal() {
+  for (let i = 0; i < numberofplayers; i++) {
+    playerCards.push(shuffleCards.pop());
+  }
+  dealerCards.push(shuffleCards.pop());
+  for (let i = 0; i < numberofplayers; i++) {
+    playerCards.push(shuffleCards.pop());
+  }
+  dealerCards.push(shuffleCards.pop());
+  gameMode = "game ongoing";
+  document.querySelector("#submit-button").disabled = true;
+  document.querySelector("#hit-button").disabled = false;
+  document.querySelector("#stand-button").disabled = false;
+  document.querySelector("#restart-button").disabled = false;
+}
+
+// reset game
+function gameReset() {
+  playerCards = [];
+  computerCards = [];
+  gameMode = "number of players";
+  shuffledDeck = shuffleCards(makeDeck());
+  document.querySelector("#submit-button").disabled = false;
+  document.querySelector("#deal-button").disabled = true;
+  document.querySelector("#hit-button").disabled = true;
+  document.querySelector("#stand-button").disabled = true;
+  document.querySelector("#restart-button").disabled = true;
+}
+
+// if player hit
+function playerHit(playerCards) {
+  gameMode = "player hit";
+  playerCards.push(shuffledDeck.pop());
+}
+
+// if player stand
+function playerStand() {
+  gameMode = "player stand";
+  document.querySelector("#deal-button").disabled = false;
+  document.querySelector("#hit-button").disabled = true;
+  document.querySelector("#stand-button").disabled = true;
+}
+
+// calculate the total value of cards in each hand
+function ValueofCards(array) {
+  return array.reduce((a, b) => b.rank + a, 0);
+}
+
+// main messages
 
 var main = function (input) {
   // Initialise index to 0 to start from the beginning of the array
@@ -154,3 +209,41 @@ var main = function (input) {
   // // Return the fully-constructed output string
   // return myOutputValue;
 };
+
+// checks if the array contains the element
+// const includestwo = items.includes(2)
+
+// cumulatively operation for the elements in an Array
+// const total = itesm.reduce((currenttotal, item) => {
+//   return item.price + currenttotal
+// }, 0)
+
+// checks the array for a cumulative boolean value
+// const itemexpensive = items.every((item) => {
+//   return item.price <= 100
+// })
+
+// checks the array for a boolean value
+// const itemexpensive = items.some((item) => {
+//   return item.price <= 100
+// })
+
+// does a function for each element in an Array
+// items.foreach((item) => {
+//   console.log(item.price)
+// })
+
+// find returns the first item in the array
+// const foundItem = item.find((item) => {
+//   return item.name === 'Album'
+// })
+
+// filter produces all that matches the said function
+// const filteredItems = items.filter((item) => {
+//   return item.price <= 100
+// })
+
+// bring out the values using key
+// const itemNames = items.map((item) => {
+//   return item.name
+// })
