@@ -13,10 +13,18 @@ document.querySelector("#restart-button").disabled = true;
 var playerCards = [];
 var computerCards = [];
 var gameMode = "number of players";
-var players = [1, 2, 3, 4, 5, 6];
-var playerScore = [0, 0, 0, 0, 0, 0];
-var computerScore = [0, 0, 0, 0, 0, 0];
+// var players = [1, 2, 3, 4, 5, 6];
+// var playerScore = [0, 0, 0, 0, 0, 0];
+// var computerScore = [0, 0, 0, 0, 0, 0];
 var numberofplayers = 1;
+var currentplayer = 0;
+
+// Players setup
+function createplayers() {
+  for (let i = 0; i < numberofplayers; i++) {
+    playerCards.push([]);
+  }
+}
 
 // returns a complete cardDeck; name, suit, rank (1-13)
 var makeDeck = function () {
@@ -111,18 +119,38 @@ var cardDeck = makeDeck();
 
 // ================ GAME MODES PRESENT ================
 
+// pre game start post player input
+function preGame() {
+  // gameMode = "game to deal";
+  document.querySelector("#submit-button").disabled = true;
+  document.querySelector("#deal-button").disabled = false;
+  document.querySelector("#restart-button").disabled = false;
+}
+
 // start of game
 function gameDeal() {
-  for (let i = 0; i < numberofplayers; i++) {
-    playerCards.push(shuffleCards.pop());
+  // creates an array within playerCards array for each player
+  createplayers();
+
+  var j = 0;
+  while (j < 2) {
+    for (let i = 0; i < numberofplayers; i++) {
+      playerCards[i].push(shuffledDeck.pop());
+    }
+    computerCards.push(shuffledDeck.pop());
+    j += 1;
   }
-  dealerCards.push(shuffleCards.pop());
-  for (let i = 0; i < numberofplayers; i++) {
-    playerCards.push(shuffleCards.pop());
-  }
-  dealerCards.push(shuffleCards.pop());
-  gameMode = "game ongoing";
+  // for (let i = 0; i < numberofplayers; i++) {
+  //   playerCards[i].push(shuffleCards.pop());
+  // }
+  // dealerCards.push(shuffleCards.pop());
+  // for (let i = 0; i < numberofplayers; i++) {
+  //   playerCards[i].push(shuffleCards.pop());
+  // }
+  // dealerCards.push(shuffleCards.pop());
+  // gameMode = "game ongoing";
   document.querySelector("#submit-button").disabled = true;
+  document.querySelector("#deal-button").disabled = true;
   document.querySelector("#hit-button").disabled = false;
   document.querySelector("#stand-button").disabled = false;
   document.querySelector("#restart-button").disabled = false;
@@ -143,7 +171,7 @@ function gameReset() {
 
 // if player hit
 function playerHit(playerCards) {
-  gameMode = "player hit";
+  // gameMode = "player hit";
   playerCards.push(shuffledDeck.pop());
 }
 
@@ -155,28 +183,140 @@ function playerStand() {
   document.querySelector("#stand-button").disabled = true;
 }
 
-// calculate the total value of cards in each hand
+// if computer hits
+function computerHit() {
+  computerCards.push(shuffledDeck.pop());
+}
+
+// calculate the total value of cards in each hand reuterns total
 function ValueofCards(array) {
-  return array.reduce((a, b) => b.rank + a, 0);
+  var cumulative = array.reduce((a, b) => b.rank + a, 0);
+  if (aceinside(array) && cumulative + 10 <= 21) {
+    cumulative += 10;
+  }
+  return cumulative;
+}
+
+// calculate for the ace in each hand if applicable #true or false
+// used in ValueofCards
+function aceinside(array) {
+  return array.some((card) => card.name == "ace");
+}
+
+// check for twentyone; #true or false
+function twentyone(array) {
+  return ValueofCards(array) == 21;
 }
 
 // main messages
 
-var main = function (input) {
-  // Initialise index to 0 to start from the beginning of the array
-  var index = 0;
-  // Define loop condition to loop until index is the length of cardDeck
-  while (index < cardDeck.length) {
-    // Access attributes of each card with dot notation.
-    console.log(cardDeck[index].name);
-    console.log(cardDeck[index].rank);
-    // Construct a string using attributes of each card object
-    var cardTitle = cardDeck[index].name + " of " + cardDeck[index].suit;
-    // Log the string
-    console.log(cardTitle);
-    // Increment the card index
-    index = index + 1;
+function computermessage() {
+  var output = `<br><br><u>Dealer's Hand:</u><br>`;
+  for (let i = 0; i < computerCards.length; i++) {
+    output += `${computerCards[i].name} of ${computerCards[i].suit}<br>`;
   }
+  output += `<br>Sum of this hand is ${ValueofCards(computerCards)}.<br><br>`;
+  return output;
+}
+
+function message(playerCards) {
+  var output = "";
+  for (let i = 0; i < playerCards.length; i++) {
+    output += `<br><br><u>Player ${i + 1}'s hand:</u><br>`;
+    for (let j = 0; j < playerCards[i].length; j++) {
+      output += `${playerCards[i][j].name} of ${playerCards[i][j].suit}<br>`;
+    }
+    output += `<br>Sum of this hand is ${ValueofCards(playerCards[i])}.`;
+    if (twentyone(playerCards[i])) {
+      output += ` Player ${i + 1} wins with Blackjack!`;
+    } else if (ValueofCards(playerCards[i]) > 21) {
+      output += ` BUST`;
+    }
+  }
+  return output;
+}
+
+var main = function (input) {
+  var myOutputValue = "";
+  // to restart the game at any time
+  if (input == "restart") {
+    gameReset();
+  }
+  // input required for number of players
+  if (gameMode == "number of players") {
+    if (Number(input) <= 6 && Number(input) >= 1) {
+      // assign number of players
+      numberofplayers = input;
+      // pregame function buttons
+      preGame();
+      gameMode = "game to deal";
+      myOutputValue += `Number of Players chosen in this game: <b>${numberofplayers}</b>`;
+      return myOutputValue;
+    } else {
+      myOutputValue += `Please input a value from 1-6 please`;
+      return myOutputValue;
+    }
+  } else if (gameMode == "game to deal") {
+    if (input == "deal") {
+      // deck out two cards per player and house
+      gameDeal();
+      gameMode = "game ongoing";
+      myOutputValue += `It is Player ${currentplayer + 1}'s turn`;
+      myOutputValue += message(playerCards) + computermessage();
+    } else {
+      myOutputValue += `Please click on the DEAL button to continue`;
+    }
+    return myOutputValue;
+  } else if (gameMode == "game ongoing") {
+    myOutputValue += `It is Player ${currentplayer + 1}'s turn`;
+    if (input == "hit") {
+      // push new card into player hand
+      playerHit(playerCards[currentplayer]);
+      if (ValueofCards(playerCards[currentplayer]) > 21) {
+        currentplayer += 1;
+        myOutputValue =
+          currentplayer < numberofplayers
+            ? `BUST! It is Player ${currentplayer + 1}'s turn`
+            : `BUST! It's the Dealer's turn`;
+      } else if (twentyone(playerCards[currentplayer])) {
+        currentplayer += 1;
+        myOutputValue =
+          currentplayer < numberofplayers
+            ? `BLACKJACK! It is Player ${currentplayer + 1}'s turn`
+            : `BLACKJACK! It's the Dealer's turn`;
+      }
+    } else if (input == "stand" && currentplayer < numberofplayers) {
+      currentplayer += 1;
+      myOutputValue =
+        currentplayer < numberofplayers
+          ? `It is Player ${currentplayer + 1}'s turn`
+          : `It's the Dealer's turn`;
+    } else {
+      myOutputValue = `It's the Dealer's turn`;
+      while (ValueofCards(computerCards) < 15) {
+        computerHit();
+      }
+      gameMode = "conclusion";
+    }
+    myOutputValue += message(playerCards) + computermessage();
+  } else if (gameMode == "conclusion") {
+  }
+  return myOutputValue;
+
+  // // Initialise index to 0 to start from the beginning of the array
+  // var index = 0;
+  // // Define loop condition to loop until index is the length of cardDeck
+  // while (index < cardDeck.length) {
+  //   // Access attributes of each card with dot notation.
+  //   console.log(cardDeck[index].name);
+  //   console.log(cardDeck[index].rank);
+  //   // Construct a string using attributes of each card object
+  //   var cardTitle = cardDeck[index].name + " of " + cardDeck[index].suit;
+  //   // Log the string
+  //   console.log(cardTitle);
+  //   // Increment the card index
+  //   index = index + 1;
+  // }
   // // Draw 2 cards from the top of the deck
   // var computerCard = shuffledDeck.pop();
   // var playerCard = shuffledDeck.pop();
