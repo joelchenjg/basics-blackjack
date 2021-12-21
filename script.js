@@ -1,8 +1,3 @@
-// var main = function (input) {
-//   var myOutputValue = 'hello world';
-//   return myOutputValue;
-// };
-
 // Initial state
 document.querySelector("#deal-button").disabled = true;
 document.querySelector("#hit-button").disabled = true;
@@ -13,9 +8,6 @@ document.querySelector("#restart-button").disabled = true;
 var playerCards = [];
 var computerCards = [];
 var gameMode = "number of players";
-// var players = [1, 2, 3, 4, 5, 6];
-// var playerScore = [0, 0, 0, 0, 0, 0];
-// var computerScore = [0, 0, 0, 0, 0, 0];
 var numberofplayers = 1;
 var currentplayer = 0;
 
@@ -160,6 +152,7 @@ function gameDeal() {
 function gameReset() {
   playerCards = [];
   computerCards = [];
+  currentplayer = 0;
   gameMode = "number of players";
   shuffledDeck = shuffleCards(makeDeck());
   document.querySelector("#submit-button").disabled = false;
@@ -181,6 +174,14 @@ function playerStand() {
   document.querySelector("#deal-button").disabled = false;
   document.querySelector("#hit-button").disabled = true;
   document.querySelector("#stand-button").disabled = true;
+}
+
+// computer deal
+function computerDeal() {
+  document.querySelector("#deal-button").disabled = false;
+  document.querySelector("#hit-button").disabled = true;
+  document.querySelector("#stand-button").disabled = true;
+  document.querySelector("#restart-button").disabled = false;
 }
 
 // if computer hits
@@ -284,6 +285,8 @@ var main = function (input) {
           currentplayer < numberofplayers
             ? `BLACKJACK! It is Player ${currentplayer + 1}'s turn`
             : `BLACKJACK! It's the Dealer's turn`;
+      } else {
+        myOutputValue += `. Hit or Stand next?`;
       }
     } else if (input == "stand" && currentplayer < numberofplayers) {
       currentplayer += 1;
@@ -291,8 +294,19 @@ var main = function (input) {
         currentplayer < numberofplayers
           ? `It is Player ${currentplayer + 1}'s turn`
           : `It's the Dealer's turn`;
-    } else {
-      myOutputValue = `It's the Dealer's turn`;
+    }
+    // else if (input == "deal" && currentplayer == numberofplayers) {
+    //   while (ValueofCards(computerCards) < 15) {
+    //     computerHit();
+    //   }
+    //   gameMode = "conclusion";
+    // }
+    else {
+      myOutputValue = `Someone came in and flipped the table. Boo!`;
+    }
+    if (currentplayer == numberofplayers) {
+      myOutputValue = `It's the Dealer's turn. Hit deal when ready.`;
+      computerDeal();
       while (ValueofCards(computerCards) < 15) {
         computerHit();
       }
@@ -300,55 +314,59 @@ var main = function (input) {
     }
     myOutputValue += message(playerCards) + computermessage();
   } else if (gameMode == "conclusion") {
+    for (let i = 0; i < playerCards.length; i++) {
+      if (ValueofCards(playerCards[i]) == 21) {
+        myOutputValue += `Player ${i + 1} won this hand with a BlackJack<br>`;
+      } else {
+        if (
+          ValueofCards(playerCards[i]) > ValueofCards(computerCards) &&
+          ValueofCards(playerCards[i]) < 21
+        ) {
+          myOutputValue += `Player ${i + 1} won this hand<br>`;
+        } else if (
+          ValueofCards(playerCards[i]) == ValueofCards(computerCards) &&
+          ValueofCards(playerCards[i]) < 21
+        ) {
+          myOutputValue += `Player ${i + 1} draw with dealer<br>`;
+        } else {
+          myOutputValue += `Player ${i + 1} lost this hand<br>`;
+        }
+      }
+    }
+    console.log(playerCards);
+    myOutputValue += message(playerCards) + computermessage();
+    gameReset();
   }
   return myOutputValue;
-
-  // // Initialise index to 0 to start from the beginning of the array
-  // var index = 0;
-  // // Define loop condition to loop until index is the length of cardDeck
-  // while (index < cardDeck.length) {
-  //   // Access attributes of each card with dot notation.
-  //   console.log(cardDeck[index].name);
-  //   console.log(cardDeck[index].rank);
-  //   // Construct a string using attributes of each card object
-  //   var cardTitle = cardDeck[index].name + " of " + cardDeck[index].suit;
-  //   // Log the string
-  //   console.log(cardTitle);
-  //   // Increment the card index
-  //   index = index + 1;
-  // }
-  // // Draw 2 cards from the top of the deck
-  // var computerCard = shuffledDeck.pop();
-  // var playerCard = shuffledDeck.pop();
-
-  // // Construct an output string to communicate which cards were drawn
-  // var myOutputValue =
-  //   "Computer had " +
-  //   computerCard.name +
-  //   " of " +
-  //   computerCard.suit +
-  //   ". Player had " +
-  //   playerCard.name +
-  //   " of " +
-  //   playerCard.suit +
-  //   ". ";
-
-  // // Compare computer and player cards by rank attribute
-  // // If computer card rank is greater than player card rank, computer wins
-  // if (computerCard.rank > playerCard.rank) {
-  //   // Add conditional-dependent text to the output string
-  //   myOutputValue = myOutputValue + "Computer wins.";
-  //   // Else if computer card rank is less than player card rank, player wins
-  // } else if (computerCard.rank < playerCard.rank) {
-  //   myOutputValue = myOutputValue + "Player wins!";
-  //   // Otherwise (i.e. ranks are equal), it's a tie
-  // } else {
-  //   myOutputValue = myOutputValue + "It's a tie.";
-  // }
-
-  // // Return the fully-constructed output string
-  // return myOutputValue;
 };
+
+// // Construct an output string to communicate which cards were drawn
+// var myOutputValue =
+//   "Computer had " +
+//   computerCard.name +
+//   " of " +
+//   computerCard.suit +
+//   ". Player had " +
+//   playerCard.name +
+//   " of " +
+//   playerCard.suit +
+//   ". ";
+
+// // Compare computer and player cards by rank attribute
+// // If computer card rank is greater than player card rank, computer wins
+// if (computerCard.rank > playerCard.rank) {
+//   // Add conditional-dependent text to the output string
+//   myOutputValue = myOutputValue + "Computer wins.";
+//   // Else if computer card rank is less than player card rank, player wins
+// } else if (computerCard.rank < playerCard.rank) {
+//   myOutputValue = myOutputValue + "Player wins!";
+//   // Otherwise (i.e. ranks are equal), it's a tie
+// } else {
+//   myOutputValue = myOutputValue + "It's a tie.";
+// }
+
+// // Return the fully-constructed output string
+// return myOutputValue;
 
 // checks if the array contains the element
 // const includestwo = items.includes(2)
