@@ -212,17 +212,22 @@ function twentyone(array) {
 // main messages
 
 function computermessage() {
-  var output = `<br><br><u>Dealer's Hand:</u><br>`;
+  var output = ``;
+  // output += `<div class="item">`;
+  output += `<br><br><u>Dealer's Hand:</u><br>`;
   for (let i = 0; i < computerCards.length; i++) {
     output += `${computerCards[i].name} of ${computerCards[i].suit}<br>`;
   }
   output += `<br>Sum of this hand is ${ValueofCards(computerCards)}.<br><br>`;
+  // output += `</div>`;
   return output;
 }
 
 function message(playerCards) {
-  var output = "";
+  // output += `<div class="item">`;
+  var output = ``;
   for (let i = 0; i < playerCards.length; i++) {
+    // output += `<div class="item">`;
     output += `<br><br><u>Player ${i + 1}'s hand:</u><br>`;
     for (let j = 0; j < playerCards[i].length; j++) {
       output += `${playerCards[i][j].name} of ${playerCards[i][j].suit}<br>`;
@@ -233,6 +238,7 @@ function message(playerCards) {
     } else if (ValueofCards(playerCards[i]) > 21) {
       output += ` BUST`;
     }
+    // output += `</div>`;
   }
   return output;
 }
@@ -307,7 +313,7 @@ var main = function (input) {
     if (currentplayer == numberofplayers) {
       myOutputValue = `It's the Dealer's turn. Hit deal when ready.`;
       computerDeal();
-      while (ValueofCards(computerCards) < 15) {
+      while (ValueofCards(computerCards) < 17) {
         computerHit();
       }
       gameMode = "conclusion";
@@ -315,25 +321,37 @@ var main = function (input) {
     myOutputValue += message(playerCards) + computermessage();
   } else if (gameMode == "conclusion") {
     for (let i = 0; i < playerCards.length; i++) {
-      if (ValueofCards(playerCards[i]) == 21) {
-        myOutputValue += `Player ${i + 1} won this hand with a BlackJack<br>`;
+      if (
+        ValueofCards(playerCards[i]) == 21 &&
+        ValueofCards(computerCards) != 21
+      ) {
+        myOutputValue += `<br>Player ${i + 1} won this hand with a BlackJack`;
+      } else if (
+        ValueofCards(playerCards[i]) == 21 &&
+        ValueofCards(computerCards) == 21
+      ) {
+        myOutputValue += `<br>Y'all play cheat with blackjack abound`;
       } else {
         if (
-          ValueofCards(playerCards[i]) > ValueofCards(computerCards) &&
+          (ValueofCards(playerCards[i]) > ValueofCards(computerCards) ||
+            ValueofCards(computerCards) > 21) &&
           ValueofCards(playerCards[i]) < 21
         ) {
-          myOutputValue += `Player ${i + 1} won this hand<br>`;
+          myOutputValue += `<br>Player ${i + 1} won this hand`;
         } else if (
           ValueofCards(playerCards[i]) == ValueofCards(computerCards) &&
           ValueofCards(playerCards[i]) < 21
         ) {
-          myOutputValue += `Player ${i + 1} draw with dealer<br>`;
+          myOutputValue += `<br>Player ${i + 1} draw with dealer`;
         } else {
-          myOutputValue += `Player ${i + 1} lost this hand<br>`;
+          myOutputValue += `<br>Player ${i + 1} lost this hand`;
         }
       }
+      if (ValueofCards(playerCards[i]) > 21) {
+        myOutputValue += ` because he/she went BUST`;
+      }
     }
-    console.log(playerCards);
+    // console.log(playerCards);
     myOutputValue += message(playerCards) + computermessage();
     gameReset();
   }
